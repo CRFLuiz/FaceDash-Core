@@ -22,13 +22,25 @@ The game features multiple arenas with different gameplay mechanics:
 
 ### Arena 3 (`/arena3`)
 - **Theme:** Dynamic Challenge
-- **Walls:** Side walls are "dead zones" (touching them respawns the marble).
-- **Obstacles:**
-  - Standard pegs.
-  - **Moving Triangles:** Two large triangles moving horizontally in opposite directions below the pegs.
-    - They are static physics bodies (unstoppable) but move via code.
-    - They push marbles aside, creating a "scissor" effect.
-- **Goal:** Navigate through the moving triangles to reach the green zone.
+- **Win Condition:** First player to reach **50 points** wins. The game ends when all players finish.
+- **Leaderboard:** 
+  - Ranked by **finish time** for those who completed the 50 points.
+  - Then by score for those still playing.
+- **Mechanics:**
+  - **Walls:** Side walls are "dead zones" (touching them respawns the marble at the top).
+  - **Floor:**
+    - Center (Green): **Score Zone** (+1 point).
+    - Sides (Red): **Dead Zone** (respawn, no points).
+  - **Obstacles:**
+    - **Pegs:** Static circular bumpers with high bounce.
+    - **Moving Triangles:** Two large triangles (200px wide) moving horizontally in opposite directions. They act as dynamic barriers.
+    - **Goalkeeper:** A moving paddle above the score zone that blocks marbles, adding a final layer of difficulty.
+
+## Tech Stack
+
+- **Frontend:** Phaser 3 (Game Engine), Matter.js (Physics)
+- **Backend:** Node.js, Express, Socket.io
+- **Communication:** Real-time websockets for player joins and updates.
 
 ## Running the Project
 
