@@ -5,6 +5,7 @@ O **FaceDash Core** é uma aplicação monolítica (Monorepo) que serve tanto o 
 
 ## Backend
 - **Tecnologia:** Node.js + Express + Socket.IO.
+- **Protocolo:** HTTPS (Utilizando certificados auto-assinados em `/certs`).
 - **Porta:** 3000 (Definida em `process.env.PORT`).
 - **Rotas:**
   - `/`: Redireciona para `/studio`.
@@ -22,5 +23,12 @@ O **FaceDash Core** é uma aplicação monolítica (Monorepo) que serve tanto o 
   - `player-left`: Servidor avisa a Arena que um jogador desconectou.
 
 ## Frontend
-- **Screen 1 (Arena):** Phaser 3 + Matter.js. Renderiza a física e as bolinhas.
-- **Screen 2 (Studio):** HTML5 + WebRTC (getUserMedia). Captura foto e recorta em canvas circular.
+- **Screen 1 (Arena):**
+  - **Stack:** Phaser 3 + Matter.js.
+  - **Fluxo:** Lobby de espera -> Início manual (Botão Start) -> Jogo.
+  - **Assets:** Texturas carregadas via Base64 (players) ou geradas dinamicamente (partículas).
+  - **Assets Locais:** `phaser.min.js` servido localmente para evitar dependências externas.
+- **Screen 2 (Studio):**
+  - **Stack:** HTML5 + WebRTC (getUserMedia).
+  - **Funcionalidade:** Captura foto, recorta em canvas circular e envia ao servidor.
+  - **Requisito:** HTTPS obrigatório para acesso à câmera em redes externas.

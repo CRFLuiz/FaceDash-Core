@@ -1,6 +1,3 @@
-const socket = io();
-
-// Config
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -21,18 +18,61 @@ const config = {
     }
 };
 
+let socket;
+try {
+    socket = io();
+} catch (e) {
+    console.error("Socket IO failed to initialize:", e);
+}
+
 const game = new Phaser.Game(config);
 
 let players = {}; // id -> { name, textureKey, marblesRemaining, nextSpawnTime, interval }
-let isGameActive = false; // Start immediately for now or wait for command? Docs say "Lobby, In-Game".
+let isGameActive = false;
+let playerCount = 0;
+
+// UI Elements
+const startBtn = document.getElementById('start-btn');
+const playerCountDisplay = document.getElementById('player-count');
+const arenaUI = document.getElementById('arena-ui');
+
+// UI Logic
+startBtn.addEventListener('click', () => {
+    if (Object.keys(players).length === 0) {
+        alert("Wait for players to join!");
+        return;
+    }
+    isGameActive = true;
+    startBtn.style.display = 'none';
+    playerCountDisplay.style.display = 'none';
+    
+    // Optional: Reset spawn timers so everyone starts EXACTLY now
+    const now = game.getTime(); // We need to access scene time, but loop handles it
+    Object.values(players).forEach(p => {
+        p.nextSpawnTime = 0; // Will spawn immediately on next update
+    });
+});
+
+function updatePlayerCount() {
+    playerCount = Object.keys(players).length;
+    playerCountDisplay.innerText = `Players Ready: ${playerCount}`;
+}
 
 function preload() {
     // Load assets if any
-    this.load.image('particle', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFklEQVR42mP8z8AARAwMjDAGU4QAAQCPQB/52/g5gAAAAABJRU5ErkJggg=='); // Simple white dot
+    // Data URIs in preload can cause issues in some environments.
+    // We will generate the texture programmatically in create().
 }
 
 function create() {
+    console.log("Phaser Create Started");
     const scene = this;
+
+    // Generate 'particle' texture
+    const graphics = scene.make.graphics({ x: 0, y: 0, add: false });
+    graphics.fillStyle(0xffffff, 1);
+    graphics.fillCircle(4, 4, 4);
+    graphics.generateTexture('particle', 8, 8);
     
     // Boundaries - Left, Right, Bottom (no top)
     scene.matter.world.setBounds(0, -200, game.config.width, game.config.height + 200, 32, true, true, true, true);
@@ -41,21 +81,24 @@ function create() {
     createPegs(scene);
 
     // Socket Events
-    socket.emit('identify', 'arena');
+    if (socket) {
+        socket.emit('identify', 'arena');
 
-    socket.on('current-players', (currentPlayers) => {
-        currentPlayers.forEach(p => addPlayer(scene, p));
-    });
+        socket.on('current-players', (currentPlayers) => {
+            currentPlayers.forEach(p => addPlayer(scene, p));
+        });
 
-    socket.on('new-player', (player) => {
-        addPlayer(scene, player);
-    });
+        socket.on('new-player', (player) => {
+            addPlayer(scene, player);
+        });
 
-    socket.on('player-left', (id) => {
-        if (players[id]) {
-            delete players[id];
-        }
-    });
+        socket.on('player-left', (id) => {
+            if (players[id]) {
+                delete players[id];
+                updatePlayerCount();
+            }
+        });
+    }
     
     // Add collision event for effects
     scene.matter.world.on('collisionstart', (event) => {
@@ -128,11 +171,15 @@ function addPlayer(scene, player) {
         interval: 1000 // 1s
     };
     
+    updatePlayerCount();
     console.log("Player added to Arena:", player.name);
 }
 
 function update(time, delta) {
     const scene = this;
+
+    // Only spawn if game is active
+    if (!isGameActive) return;
 
     // Spawn Logic
     Object.values(players).forEach(player => {

@@ -12,9 +12,12 @@ A infraestrutura é gerenciada externamente pela pasta `FaceDash-Infra`.
    ```bash
    docker-compose up --build
    ```
-3. Acesse:
-   - Arena: http://localhost:3000/arena
-   - Studio: http://localhost:3000/studio
+3. Acesse (via HTTPS):
+   - Arena: https://localhost:3000/arena
+   - Studio: https://localhost:3000/studio
+   
+   *Nota: Como os certificados são auto-assinados, aceite o aviso de segurança do navegador.*
 
-## Desenvolvimento
-- O container roda com `nodemon`, então alterações nos arquivos `.js` e `.html` reiniciam o servidor ou são servidas imediatamente (para arquivos estáticos, um refresh na página é necessário).
+## Troubleshooting
+- **Tela Branca na Arena:** Verifique se o `phaser.min.js` está carregando. O servidor agora serve este arquivo localmente.
+- **Câmera Bloqueada no Studio:** Certifique-se de estar usando `https://` e não `http://`. Navegadores modernos bloqueiam WebRTC em conexões inseguras (exceto localhost).
