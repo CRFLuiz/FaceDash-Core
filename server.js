@@ -32,6 +32,10 @@ app.get('/arena', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'screen1.html'));
 });
 
+app.get('/arena2', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'screen3.html'));
+});
+
 app.get('/studio', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'screen2.html'));
 });

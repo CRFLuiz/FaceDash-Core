@@ -115,7 +115,7 @@ function create() {
     scene.matter.world.setBounds(0, -200, game.config.width, game.config.height + 200, 32, true, true, true, true);
 
     // 1. Spawner Funnel (Top)
-    createFunnel(scene);
+    // createFunnel(scene); // Funnel removed for Arena 2
 
     // 2. Static Obstacles (Pegs)
     createPegs(scene);
@@ -221,7 +221,7 @@ function create() {
 
                 // Respawn marble (move to top)
                 if (marbleObj) {
-                    const x = Phaser.Math.Between(game.config.width * 0.4, game.config.width * 0.6);
+                    const x = Phaser.Math.Between(50, game.config.width - 50);
                     const y = -100;
                     
                     marbleObj.setPosition(x, y);
@@ -257,8 +257,8 @@ function createFunnel(scene) {
 }
 
 function createPegs(scene) {
-    const rows = 6; // Reduced rows to make space for spinners
-    const cols = 9;
+    const rows = 4; // Fewer rows (was 6)
+    const cols = 5; // Fewer cols (was 9)
     const spacingX = game.config.width / cols;
     const spacingY = (game.config.height * 0.4) / rows;
     const startY = 200;
@@ -267,13 +267,13 @@ function createPegs(scene) {
     const spinnerY = game.config.height * 0.6;
     const spinnerX1 = game.config.width * 0.3;
     const spinnerX2 = game.config.width * 0.7;
-    const safeRadius = 130; // 80 (half length) + buffer
+    const safeRadius = 160; // Increased buffer
 
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             let x = j * spacingX + spacingX / 2;
             if (i % 2 === 1) x += spacingX / 2;
-            x += Phaser.Math.Between(-5, 5);
+            x += Phaser.Math.Between(-10, 10); // More randomness
             const y = startY + i * spacingY;
             
             // Check exclusion zone
@@ -432,7 +432,7 @@ function addPlayer(scene, player) {
         textureKey: textureKey,
         marblesRemaining: 50,
         nextSpawnTime: 0,
-        interval: 1000,
+        interval: 2000,
         score: 0
     };
     
@@ -479,10 +479,8 @@ function update(time, delta) {
                 spawnMarble(scene, player);
                 player.marblesRemaining--;
                 
-                const marblesUsed = 50 - player.marblesRemaining;
-                if (marblesUsed % 10 === 0) {
-                    player.interval = Math.max(600, player.interval - 100);
-                }
+                // Fixed interval for Arena 2
+                player.interval = 2000;
                 player.nextSpawnTime = time + player.interval;
             }
         }
@@ -490,8 +488,8 @@ function update(time, delta) {
 }
 
 function spawnMarble(scene, player) {
-    // Spawn at top center (Funnel area)
-    const x = Phaser.Math.Between(game.config.width * 0.4, game.config.width * 0.6);
+    // Spawn at top, random X across the width
+    const x = Phaser.Math.Between(50, game.config.width - 50); // Padding to avoid walls
     const y = -100; 
 
     const marble = scene.matter.add.image(x, y, player.textureKey, null, {
@@ -502,8 +500,8 @@ function spawnMarble(scene, player) {
         label: 'marble'
     });
     
-    marble.setDisplaySize(40, 40);
-    marble.setCircle(20);
+    marble.setDisplaySize(80, 80); // Doubled size (was 40, 40)
+    marble.setCircle(40); // Doubled radius (was 20)
     marble.setBounce(1.0); // Use setBounce for restitution in Phaser Matter wrapper
     marble.body.label = 'marble'; // Re-assign label after setCircle
     marble.setData('playerId', player.id); // Store ID for scoring
