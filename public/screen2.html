@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceDash Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="studio-container">
+        <h1>FaceDash Studio</h1>
+        <div class="camera-container">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <div class="overlay-circle"></div>
+        </div>
+        <input type="text" id="username" placeholder="Enter your name" maxlength="12">
+        <button id="capture-btn">CAPTURE FACE</button>
+        
+        <div id="preview-container" style="display:none;">
+            <h3>Preview</h3>
+            <img id="preview-img" src="">
+            <div>
+                <button id="retake-btn">RETAKE</button>
+                <button id="join-btn">ENTER ARENA</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/screen2.js"></script>
+</body>
+</html>

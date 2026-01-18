@@ -1,0 +1,18 @@
+{
+  "name": "facedash-core",
+  "version": "1.0.0",
+  "description": "FaceDash: Marble Royale Core",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

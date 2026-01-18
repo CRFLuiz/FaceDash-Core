@@ -1,0 +1,116 @@
+:root {
+    --deep-navy: #0F0C29;
+    --electric-purple: #9D50BB;
+    --action-pink: #FF0080;
+    --cyber-cyan: #00F2FE;
+    --victory-gold: #F2C94C;
+}
+
+body {
+    background-color: var(--deep-navy);
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+#studio-container {
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--cyber-cyan);
+    text-shadow: 0 0 10px var(--cyber-cyan);
+}
+
+.camera-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid var(--electric-purple);
+    box-shadow: 0 0 20px var(--electric-purple);
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* Mirror effect */
+}
+
+.overlay-circle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--action-pink);
+    box-shadow: inset 0 0 20px var(--action-pink);
+    opacity: 0.5;
+    pointer-events: none;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 0.5; }
+}
+
+input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--cyber-cyan);
+    color: white;
+    padding: 10px;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    width: 80%;
+    text-align: center;
+}
+
+button {
+    background: linear-gradient(45deg, var(--electric-purple), var(--action-pink));
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px var(--action-pink);
+    transition: transform 0.2s;
+    margin: 10px;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+#preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#preview-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid var(--cyber-cyan);
+    margin-bottom: 20px;
+    transform: scaleX(-1); /* Mirror effect for preview too */
+}
