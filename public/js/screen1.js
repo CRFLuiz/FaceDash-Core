@@ -268,8 +268,8 @@ function createSpinners(scene) {
 
 function createSideWalls(scene) {
     const wallWidth = 40;
-    const wallHeight = 200; // Short walls at the bottom sides
-    const y = game.config.height - 100;
+    const wallHeight = game.config.height; // Full height
+    const y = game.config.height / 2;
 
     // Left Wall
     const leftWall = scene.add.rectangle(wallWidth / 2, y, wallWidth, wallHeight, 0xFF0000);
