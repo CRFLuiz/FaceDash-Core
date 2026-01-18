@@ -346,7 +346,7 @@ function createGoalkeeper(scene) {
     const greenWidth = width * 0.3;
     
     // Goalkeeper dimensions
-    const keeperWidth = greenWidth * 0.2;
+    const keeperWidth = greenWidth * 0.4; // Doubled width (was 0.2)
     const keeperHeight = 10;
     
     // Position: above the floor
