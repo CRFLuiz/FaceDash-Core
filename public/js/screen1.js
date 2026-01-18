@@ -106,6 +106,9 @@ function create() {
     // 5. Score Zone (Floor)
     createFloor(scene);
 
+    // 6. Goalkeeper
+    createGoalkeeper(scene);
+
     // Socket Events
     if (socket) {
         socket.emit('identify', 'arena');
@@ -146,7 +149,7 @@ function create() {
                 }
             }
 
-            // Marble hits Score Zone
+            // Marble hits Score Zone (Green)
             if ((bodyA.label === 'marble' && bodyB.label === 'scoreZone') || 
                 (bodyB.label === 'marble' && bodyA.label === 'scoreZone')) {
                 
@@ -162,6 +165,19 @@ function create() {
                         // Destroy marble
                         marbleObj.destroy();
                     }
+                }
+            }
+
+            // Marble hits Dead Zone (Red Floor)
+            if ((bodyA.label === 'marble' && bodyB.label === 'deadZone') || 
+                (bodyB.label === 'marble' && bodyA.label === 'deadZone')) {
+                
+                const marbleBody = bodyA.label === 'marble' ? bodyA : bodyB;
+                const marbleObj = marbleBody.gameObject;
+
+                // Just destroy marble, no points
+                if (marbleObj) {
+                    marbleObj.destroy();
                 }
             }
 
@@ -287,14 +303,70 @@ function createSideWalls(scene) {
 function createFloor(scene) {
     const floorHeight = 40; // Same thickness as walls
     const y = game.config.height - floorHeight / 2;
+    const width = game.config.width;
     
-    // Red visible floor
-    const rect = scene.add.rectangle(game.config.width / 2, y, game.config.width, floorHeight, 0xFF0000);
-    
-    scene.matter.add.gameObject(rect, {
+    // Width calculations
+    const greenWidth = width * 0.3;
+    const redWidth = (width - greenWidth) / 2;
+
+    // 1. Left Red Floor
+    const leftRect = scene.add.rectangle(redWidth / 2, y, redWidth, floorHeight, 0xFF0000);
+    scene.matter.add.gameObject(leftRect, {
         isStatic: true,
-        label: 'scoreZone' // Acts as the score zone
+        label: 'deadZone' // No points, just destroy
     });
+
+    // 2. Center Green Floor (Goal)
+    const centerRect = scene.add.rectangle(width / 2, y, greenWidth, floorHeight, 0x00FF00);
+    scene.matter.add.gameObject(centerRect, {
+        isStatic: true,
+        label: 'scoreZone' // Gives points
+    });
+
+    // 3. Right Red Floor
+    const rightRect = scene.add.rectangle(width - redWidth / 2, y, redWidth, floorHeight, 0xFF0000);
+    scene.matter.add.gameObject(rightRect, {
+        isStatic: true,
+        label: 'deadZone' // No points, just destroy
+    });
+}
+
+let goalkeeper;
+let goalkeeperDirection = 1;
+let goalkeeperSpeed = 3;
+let goalRange = {};
+
+function createGoalkeeper(scene) {
+    const width = game.config.width;
+    const greenWidth = width * 0.3;
+    
+    // Goalkeeper dimensions
+    const keeperWidth = greenWidth * 0.2;
+    const keeperHeight = 10;
+    
+    // Position: above the floor
+    const y = game.config.height - 60; 
+    
+    // Define movement range (relative to the green zone)
+    const centerX = width / 2;
+    const halfGreen = greenWidth / 2;
+    goalRange = {
+        min: centerX - halfGreen + keeperWidth / 2,
+        max: centerX + halfGreen - keeperWidth / 2
+    };
+
+    // Create Goalkeeper
+    const rect = scene.add.rectangle(centerX, y, keeperWidth, keeperHeight, 0xFFFFFF);
+    goalkeeper = scene.matter.add.gameObject(rect, {
+        isStatic: false,
+        isSensor: false,
+        friction: 0,
+        frictionAir: 0,
+        inertia: Infinity,
+        ignoreGravity: true,
+        label: 'goalkeeper'
+    });
+    goalkeeper.setFixedRotation();
 }
 
 function addPlayer(scene, player) {
@@ -327,6 +399,22 @@ function update(time, delta) {
         scene.spinners.forEach(spinner => {
             spinner.setAngularVelocity(spinner.rotationSpeed);
         });
+    }
+
+    // Goalkeeper Logic
+    if (goalkeeper) {
+        goalkeeper.setVelocityX(goalkeeperSpeed * goalkeeperDirection);
+        goalkeeper.setVelocityY(0);
+        goalkeeper.setAngle(0);
+
+        // Bounce at the edges of the green zone
+        if (goalkeeper.x >= goalRange.max) {
+            goalkeeperDirection = -1;
+            goalkeeper.x = goalRange.max; // Clamp
+        } else if (goalkeeper.x <= goalRange.min) {
+            goalkeeperDirection = 1;
+            goalkeeper.x = goalRange.min; // Clamp
+        }
     }
 
 
