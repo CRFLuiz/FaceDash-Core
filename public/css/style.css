@@ -153,3 +153,42 @@ button:active {
     border-radius: 10px;
     border: 1px solid var(--electric-purple);
 }
+
+/* Leaderboard */
+#leaderboard {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 250px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid var(--cyber-cyan);
+    border-radius: 10px;
+    padding: 10px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+#leaderboard h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--victory-gold);
+    text-align: center;
+    margin: 0 0 10px 0;
+    border-bottom: 1px solid var(--electric-purple);
+    padding-bottom: 5px;
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+
+.leaderboard-item span.score {
+    color: var(--cyber-cyan);
+    font-weight: bold;
+}
