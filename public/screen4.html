@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceDash Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            overflow: hidden;
+            background-color: #0F0C29;
+            margin: 0;
+            padding: 0;
+        }
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+    <script src="js/phaser.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="arena-ui">
+        <div id="player-count">Players Ready: 0</div>
+        <button id="start-btn">START MATCH</button>
+    </div>
+    
+    <div id="leaderboard">
+        <h3>TOP PLAYERS</h3>
+        <div id="leaderboard-list">
+            <!-- Items injected by JS -->
+        </div>
+    </div>
+
+    <div id="game-container"></div>
+    <script src="js/screen4.js"></script>
+</body>
+</html>
