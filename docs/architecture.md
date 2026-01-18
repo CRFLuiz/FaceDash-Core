@@ -30,7 +30,8 @@ O **FaceDash Core** é uma aplicação monolítica (Monorepo) que serve tanto o 
     - **Funil:** Paredes estáticas superiores para direcionar o spawn.
     - **Pegs (Pinos):** Obstáculos estáticos circulares com alta restituição (bounciness) para espalhar as bolinhas.
     - **Spinners (Ventiladores):** Pás giratórias cinemáticas (Kinematic Bodies) que giram constantemente para empurrar as bolinhas, ignorando gravidade.
-    - **Goleiro:** Obstáculo móvel horizontal na base.
+    - **Paredes Laterais:** Obstáculos estáticos vermelhos nas laterais inferiores para conter as bolinhas.
+    - **Score Zone:** Sensor invisível na base que detecta as bolinhas, atribui 10 pontos ao jogador e remove a bolinha.
   - **Assets:** Texturas carregadas via Base64 (players) ou geradas dinamicamente (partículas).
   - **Assets Locais:** `phaser.min.js` servido localmente para evitar dependências externas.
 - **Screen 2 (Studio):**

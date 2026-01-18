@@ -100,8 +100,11 @@ function create() {
     scene.spinners = []; // Initialize array for spinners
     createSpinners(scene);
 
-    // 4. Goalkeeper
-    createGoalkeeper(scene);
+    // 4. Side Walls
+    createSideWalls(scene);
+
+    // 5. Score Zone
+    createScoreZone(scene);
 
     // Socket Events
     if (socket) {
@@ -143,9 +146,9 @@ function create() {
                 }
             }
 
-            // Marble hits Goal Sensor
-            if ((bodyA.label === 'marble' && bodyB.label === 'goalSensor') || 
-                (bodyB.label === 'marble' && bodyA.label === 'goalSensor')) {
+            // Marble hits Score Zone
+            if ((bodyA.label === 'marble' && bodyB.label === 'scoreZone') || 
+                (bodyB.label === 'marble' && bodyA.label === 'scoreZone')) {
                 
                 const marbleBody = bodyA.label === 'marble' ? bodyA : bodyB;
                 const marbleObj = marbleBody.gameObject;
@@ -153,15 +156,16 @@ function create() {
                 if (marbleObj && marbleObj.getData('playerId')) {
                     const playerId = marbleObj.getData('playerId');
                     if (players[playerId]) {
-                        players[playerId].score++;
+                        players[playerId].score += 10; // 10 points for scoring
                         updateLeaderboard();
                         
-                        // Visual Feedback for Goal?
                         // Destroy marble
                         marbleObj.destroy();
                     }
                 }
             }
+
+
         });
     });
 }
@@ -171,17 +175,19 @@ function createFunnel(scene) {
     const startY = -50;
     
     // Left Wall
-    scene.matter.add.rectangle(width * 0.2, startY + 100, 400, 20, {
+    const leftWall = scene.add.rectangle(width * 0.2, startY + 100, 400, 20, 0x00F2FE);
+    leftWall.setRotation(0.5);
+    scene.matter.add.gameObject(leftWall, {
         isStatic: true,
-        angle: 0.5,
-        render: { fillStyle: '#00F2FE' }
+        angle: 0.5
     });
 
     // Right Wall
-    scene.matter.add.rectangle(width * 0.8, startY + 100, 400, 20, {
+    const rightWall = scene.add.rectangle(width * 0.8, startY + 100, 400, 20, 0x00F2FE);
+    rightWall.setRotation(-0.5);
+    scene.matter.add.gameObject(rightWall, {
         isStatic: true,
-        angle: -0.5,
-        render: { fillStyle: '#00F2FE' }
+        angle: -0.5
     });
 }
 
@@ -260,32 +266,32 @@ function createSpinners(scene) {
     });
 }
 
-let goalkeeper;
-let goalkeeperDirection = 1;
-
-function createGoalkeeper(scene) {
+function createSideWalls(scene) {
+    const wallWidth = 40;
+    const wallHeight = 200; // Short walls at the bottom sides
     const y = game.config.height - 100;
-    const width = 100;
-    const height = 30;
 
-    // Goalkeeper Body (Kinematic)
-    const rect = scene.add.rectangle(game.config.width / 2, y, width, height, 0xFF0080);
-    goalkeeper = scene.matter.add.gameObject(rect, {
-        isStatic: false,
-        isSensor: false,
-        friction: 0,
-        frictionAir: 0,
-        inertia: Infinity, // Prevent rotation
-        ignoreGravity: true
+    // Left Wall
+    const leftWall = scene.add.rectangle(wallWidth / 2, y, wallWidth, wallHeight, 0xFF0000);
+    scene.matter.add.gameObject(leftWall, {
+        isStatic: true
     });
-    goalkeeper.setFixedRotation();
+
+    // Right Wall
+    const rightWall = scene.add.rectangle(game.config.width - wallWidth / 2, y, wallWidth, wallHeight, 0xFF0000);
+    scene.matter.add.gameObject(rightWall, {
+        isStatic: true
+    });
+}
+
+function createScoreZone(scene) {
+    const y = game.config.height - 10; // Just at the bottom
+    const rect = scene.add.rectangle(game.config.width / 2, y, game.config.width, 20, 0x00ff00, 0.0); // Invisible
     
-    // Goal Sensor (Behind Goalkeeper)
-    const sensorRect = scene.add.rectangle(game.config.width / 2, game.config.height - 20, game.config.width, 50, 0x00F2FE, 0.3);
-    scene.matter.add.gameObject(sensorRect, {
+    scene.matter.add.gameObject(rect, {
         isStatic: true,
         isSensor: true,
-        label: 'goalSensor'
+        label: 'scoreZone'
     });
 }
 
@@ -321,25 +327,7 @@ function update(time, delta) {
         });
     }
 
-    // Goalkeeper Movement
-    if (goalkeeper) {
-        const speed = 5;
-        const limitX = game.config.width * 0.4; // Range from center
-        
-        goalkeeper.x += speed * goalkeeperDirection;
-        
-        // Bounce logic (simple X check)
-        if (goalkeeper.x > game.config.width - 50 || goalkeeper.x < 50) {
-            goalkeeperDirection *= -1;
-        }
-        
-        // Ensure body follows visual (Phaser Matter syncs automatically usually, but kinematic needs explicit velocity or position set)
-        // Since we set position directly above, we are essentially teleporting. Better to set velocity.
-        goalkeeper.setVelocityX(speed * goalkeeperDirection);
-        goalkeeper.setVelocityY(0);
-        // Correct rotation just in case
-        goalkeeper.setAngle(0);
-    }
+
 
     // Only spawn if game is active
     if (!isGameActive) return;
