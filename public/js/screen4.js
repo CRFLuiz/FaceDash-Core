@@ -53,6 +53,7 @@ startBtn.addEventListener('click', () => {
         p.score = 0; // Reset scores
         p.marblesRemaining = 50; // Reset marbles
         p.finished = false; // Reset finished status
+        p.finishTime = 0; // Reset finish time
     });
     
     // Clear existing marbles
@@ -85,8 +86,17 @@ function updatePlayerCount() {
 }
 
 function updateLeaderboard() {
-    // Sort players by score DESC
-    const sortedPlayers = Object.values(players).sort((a, b) => b.score - a.score);
+    // Sort players: 
+    // 1. Finished players first (sorted by finishTime ASC)
+    // 2. Unfinished players next (sorted by score DESC)
+    const sortedPlayers = Object.values(players).sort((a, b) => {
+        if (a.finished && b.finished) {
+            return a.finishTime - b.finishTime; // First to finish wins
+        }
+        if (a.finished) return -1; // a finished, b didn't -> a first
+        if (b.finished) return 1;  // b finished, a didn't -> b first
+        return b.score - a.score;  // Both unfinished -> higher score first
+    });
     
     leaderboardList.innerHTML = '';
     sortedPlayers.forEach(p => {
@@ -192,7 +202,10 @@ function create() {
 
                         // Check Win Condition (50 points)
                         if (player.score >= 50) {
-                            player.finished = true;
+                            if (!player.finished) {
+                                player.finished = true;
+                                player.finishTime = Date.now();
+                            }
                             
                             // Destroy all remaining marbles for this player
                             const allBodies = scene.matter.world.getAllBodies();
