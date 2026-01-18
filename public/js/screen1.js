@@ -97,6 +97,7 @@ function create() {
     createPegs(scene);
 
     // 3. Dynamic Obstacles (Spinners)
+    scene.spinners = []; // Initialize array for spinners
     createSpinners(scene);
 
     // 4. Goalkeeper
@@ -191,6 +192,12 @@ function createPegs(scene) {
     const spacingY = (game.config.height * 0.4) / rows;
     const startY = 200;
 
+    // Spinner positions for exclusion zone
+    const spinnerY = game.config.height * 0.6;
+    const spinnerX1 = game.config.width * 0.3;
+    const spinnerX2 = game.config.width * 0.7;
+    const safeRadius = 130; // 80 (half length) + buffer
+
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             let x = j * spacingX + spacingX / 2;
@@ -198,16 +205,24 @@ function createPegs(scene) {
             x += Phaser.Math.Between(-5, 5);
             const y = startY + i * spacingY;
             
+            // Check exclusion zone
+            const dist1 = Phaser.Math.Distance.Between(x, y, spinnerX1, spinnerY);
+            const dist2 = Phaser.Math.Distance.Between(x, y, spinnerX2, spinnerY);
+
+            if (dist1 < safeRadius || dist2 < safeRadius) {
+                continue; // Skip peg creation near spinners
+            }
+
             // Create peg
-            const peg = scene.add.circle(x, y, 8, 0x9D50BB); // Electric Purple
+            const peg = scene.add.circle(x, y, 10, 0x9D50BB); // Increased visual radius
             scene.matter.add.gameObject(peg, {
                 isStatic: true,
                 shape: 'circle', // Force circular body
-                radius: 8,
+                radius: 10,      // Match visual radius
                 label: 'peg',
                 friction: 0,      // No friction to avoid sticking
                 frictionStatic: 0,
-                restitution: 1.0  // High bounciness
+                restitution: 1.5  // Super high bounciness
             });
         }
     }
@@ -217,38 +232,31 @@ function createSpinners(scene) {
     const startY = game.config.height * 0.6;
     const positions = [0.3, 0.7]; // Two spinners
 
-    positions.forEach(pos => {
+    positions.forEach((pos, index) => {
         const x = game.config.width * pos;
-        const spinner = scene.matter.add.rectangle(x, startY, 150, 20, {
-            isStatic: false,
-            density: 0.01 // Heavy enough to hit but light enough to spin
-        });
+        const rect = scene.add.rectangle(x, startY, 200, 20, 0xF2C94C); // Longer blades
         
-        // Pivot constraint
-        scene.matter.add.constraint(spinner, { x: x, y: startY }, 0, 1, {
-            pointA: { x: x, y: startY },
-            pointB: { x: 0, y: 0 }
-        });
-        
-        // Add visual (since matter.add.rectangle creates invisible body by default if not gameObject)
-        // Actually, let's make it a gameObject to be easier
-        // Re-doing spinner as gameObject
-    });
-    
-    // Better approach for visuals
-    positions.forEach(pos => {
-        const x = game.config.width * pos;
-        const rect = scene.add.rectangle(x, startY, 160, 20, 0xF2C94C);
         const body = scene.matter.add.gameObject(rect, {
             shape: 'rectangle',
-            density: 0.1,
-            friction: 0.05
+            isStatic: false,
+            ignoreGravity: true,
+            friction: 0.1,      // Small friction to help push marbles
+            frictionAir: 0,
+            restitution: 0.8,
+            density: 0.1
         });
 
+        // Pin to background
         scene.matter.add.worldConstraint(body, 0, 1, {
             pointA: { x: x, y: startY },
-            pointB: { x: 0, y: 0 }
+            pointB: { x: 0, y: 0 },
+            stiffness: 1
         });
+
+        // Set rotation speed (Left: CCW, Right: CW to push outwards)
+        body.rotationSpeed = (index === 0) ? -0.05 : 0.05;
+        
+        scene.spinners.push(body);
     });
 }
 
@@ -305,6 +313,13 @@ function addPlayer(scene, player) {
 
 function update(time, delta) {
     const scene = this;
+
+    // Spinners Logic
+    if (scene.spinners) {
+        scene.spinners.forEach(spinner => {
+            spinner.setAngularVelocity(spinner.rotationSpeed);
+        });
+    }
 
     // Goalkeeper Movement
     if (goalkeeper) {

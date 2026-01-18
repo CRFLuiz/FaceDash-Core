@@ -26,6 +26,11 @@ O **FaceDash Core** é uma aplicação monolítica (Monorepo) que serve tanto o 
 - **Screen 1 (Arena):**
   - **Stack:** Phaser 3 + Matter.js.
   - **Fluxo:** Lobby de espera -> Início manual (Botão Start) -> Jogo.
+  - **Mecânicas de Jogo:**
+    - **Funil:** Paredes estáticas superiores para direcionar o spawn.
+    - **Pegs (Pinos):** Obstáculos estáticos circulares com alta restituição (bounciness) para espalhar as bolinhas.
+    - **Spinners (Ventiladores):** Pás giratórias cinemáticas (Kinematic Bodies) que giram constantemente para empurrar as bolinhas, ignorando gravidade.
+    - **Goleiro:** Obstáculo móvel horizontal na base.
   - **Assets:** Texturas carregadas via Base64 (players) ou geradas dinamicamente (partículas).
   - **Assets Locais:** `phaser.min.js` servido localmente para evitar dependências externas.
 - **Screen 2 (Studio):**
