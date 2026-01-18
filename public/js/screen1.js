@@ -103,8 +103,8 @@ function create() {
     // 4. Side Walls
     createSideWalls(scene);
 
-    // 5. Score Zone
-    createScoreZone(scene);
+    // 5. Score Zone (Floor)
+    createFloor(scene);
 
     // Socket Events
     if (socket) {
@@ -284,14 +284,16 @@ function createSideWalls(scene) {
     });
 }
 
-function createScoreZone(scene) {
-    const y = game.config.height - 10; // Just at the bottom
-    const rect = scene.add.rectangle(game.config.width / 2, y, game.config.width, 20, 0x00ff00, 0.0); // Invisible
+function createFloor(scene) {
+    const floorHeight = 40; // Same thickness as walls
+    const y = game.config.height - floorHeight / 2;
+    
+    // Red visible floor
+    const rect = scene.add.rectangle(game.config.width / 2, y, game.config.width, floorHeight, 0xFF0000);
     
     scene.matter.add.gameObject(rect, {
         isStatic: true,
-        isSensor: true,
-        label: 'scoreZone'
+        label: 'scoreZone' // Acts as the score zone
     });
 }
 
