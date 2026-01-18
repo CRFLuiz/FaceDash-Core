@@ -70,8 +70,8 @@ function checkEndGame() {
     const activePlayers = Object.values(players).filter(p => !p.finished);
     const totalPlayers = Object.keys(players).length;
 
-    // If only 1 or 0 players remain active (and there were players to begin with)
-    if (activePlayers.length <= 1 && totalPlayers > 1) {
+    // End if everyone finished OR (in multiplayer) only 1 person is left
+    if (activePlayers.length === 0 || (activePlayers.length <= 1 && totalPlayers > 1)) {
         isGameActive = false;
         startBtn.innerText = "Reiniciar Partida";
         startBtn.style.display = 'block';
