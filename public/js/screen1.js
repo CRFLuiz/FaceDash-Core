@@ -159,7 +159,7 @@ function create() {
                 if (marbleObj && marbleObj.getData('playerId')) {
                     const playerId = marbleObj.getData('playerId');
                     if (players[playerId]) {
-                        players[playerId].score += 10; // 10 points for scoring
+                        players[playerId].score += 1; // 1 point for scoring
                         updateLeaderboard();
                         
                         // Destroy marble
@@ -175,9 +175,14 @@ function create() {
                 const marbleBody = bodyA.label === 'marble' ? bodyA : bodyB;
                 const marbleObj = marbleBody.gameObject;
 
-                // Just destroy marble, no points
+                // Respawn marble (move to top)
                 if (marbleObj) {
-                    marbleObj.destroy();
+                    const x = Phaser.Math.Between(game.config.width * 0.4, game.config.width * 0.6);
+                    const y = -100;
+                    
+                    marbleObj.setPosition(x, y);
+                    marbleObj.setVelocity(0, 0);
+                    marbleObj.setAngularVelocity(0);
                 }
             }
 
@@ -364,7 +369,8 @@ function createGoalkeeper(scene) {
         frictionAir: 0,
         inertia: Infinity,
         ignoreGravity: true,
-        label: 'goalkeeper'
+        label: 'goalkeeper',
+        restitution: 1.2 // High bounciness for goalkeeper
     });
     goalkeeper.setFixedRotation();
 }
@@ -455,6 +461,7 @@ function spawnMarble(scene, player) {
     marble.setDisplaySize(40, 40);
     marble.setCircle(20);
     marble.setBounce(1.0); // Use setBounce for restitution in Phaser Matter wrapper
+    marble.body.label = 'marble'; // Re-assign label after setCircle
     marble.setData('playerId', player.id); // Store ID for scoring
 }
 
